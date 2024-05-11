@@ -18,4 +18,3 @@ npm run deploy
 
 ### License
 **redmine summary** is released under the MIT license. See [LICENSE](LICENSE) for details.
-```
