@@ -9,10 +9,10 @@
  */
 async function fetchTimeEntries(endpoint, apikey, user = 'me') {
     const today = new Date()
-    const fromDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6)
-    const toDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6 - today.getDay())
-    const from = fromDay.toISOString().split('T')[0]
-    const to = toDay.toISOString().split('T')[0]
+    const sundayOfThisWeek = new Date(today.setDate(today.getDate() - today.getDay()))
+    const saturdayOfThisWeek = new Date(today.setDate(today.getDate() + 6))
+    const from = sundayOfThisWeek.toISOString().split('T')[0]
+    const to = saturdayOfThisWeek.toISOString().split('T')[0]
     const url = `${endpoint}/time_entries.json?from=${from}&to=${to}&limit=100&user_id=${user}`
     console.log(url)
     const req = new Request(url, {
