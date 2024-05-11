@@ -99,20 +99,20 @@ function renderWeeklyHTML(list) {
     }
     for (const type in typeGroup) {
         html += `<h4>${type}</h4>\n`
-        html += `<ul>\n`
+        html += `<ol>\n`
         for (const item of typeGroup[type]) {
             html += `<li><h5>${item.subject} (issue: ${item.issue_id})</h5></li>\n`
             if (item.entries) {
-                html += `<ul>\n`
+                html += `<ol>\n`
                 for (const entry of item.entries) {
                     if (entry.comment) {
                         html += `<li>${entry.comment}</li>\n`
                     }
                 }
-                html += `</ul>\n`
+                html += `</ol>\n`
             }
         }
-        html += `</ul>\n`
+        html += `</ol>\n`
     }
     return html
 }
@@ -209,6 +209,10 @@ const HTML_TEMPLATE = `
     </body>
     <script>
         document.querySelector('button').addEventListener('click', async () => {
+            const btn = document.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = '正在生成...';
+            btn.classList.add('disabled');
             const key = document.querySelector('#api-key').value;
             const res = await fetch('/api/summary', {
                 method: 'POST',
@@ -217,6 +221,9 @@ const HTML_TEMPLATE = `
                 },
                 body: JSON.stringify({key})
             });
+            btn.disabled = false;
+            btn.innerText = '提交';
+            btn.classList.remove('disabled');
             document.querySelector('#output').innerHTML = await res.text();
         });
     </script>
