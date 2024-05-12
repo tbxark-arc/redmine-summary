@@ -7,9 +7,7 @@
     <meta name="description" content="An online preview tool for Testmail." />
     <meta name="author" content="TBXark" />
     <title>周报生成</title>
-    <link href="https://unpkg.com/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet"></head>
 <body>
     <div class="container" style="padding: 10px; min-height: calc(100vh - 56px);">
         <h2>Redmine周报总结生成器</h2>
@@ -18,14 +16,14 @@
             <button id="submit" type="submit" class="btn btn-primary"
                 style="width: 150px; margin-left: 10px;">提交</button>
         </div>
-        <p style="font-size: 15px;color: gray;">PS: 你可以在<a
-                href="$$REDMINE_BASE$$/my/api_key">这里</a>找到你的API密钥.</p>
+        <p style="font-size: 15px;color: gray;">PS: 你可以在<a href="$$REDMINE_BASE$$/my/api_key">这里</a>找到你的API密钥.</p>
         <div id="output" class="well" style="margin-top: 20px;">
         </div>
     </div>
     <footer class="footer mt-auto py-3 bg-light">
         <div class="container">
-            <span class="text-muted">Made with ❤️ by <a href="https://github.com/TBXark/redmine-summary">TBXark</a></span>
+            <span class="text-muted">Made with ❤️ by <a
+                    href="https://github.com/TBXark/redmine-summary">TBXark</a></span>
         </div>
     </footer>
 </body>
@@ -35,21 +33,26 @@
         const output = document.getElementById('output');
         const apiKey = document.getElementById('api-key');
         btn.addEventListener('click', async () => {
-            btn.disabled = true;
-            btn.innerText = '正在生成...';
-            btn.classList.add('disabled');
-            const key = apiKey.value;
-            const res = await fetch('/api/summary', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ key })
-            });
-            btn.disabled = false;
-            btn.innerText = '提交';
-            btn.classList.remove('disabled');
-            output.innerHTML = await res.text();
+            try {
+                btn.disabled = true;
+                btn.innerText = '正在生成...';
+                btn.classList.add('disabled');
+                const key = apiKey.value;
+                const res = await fetch('/api/summary', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ key })
+                });
+                output.innerHTML = await res.text();
+            } catch (error) {
+                output.innerHTML = error.toString();
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '提交';
+                btn.classList.remove('disabled');
+            }
         });
     }
     document.addEventListener('DOMContentLoaded', main);
