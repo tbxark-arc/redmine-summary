@@ -156,31 +156,40 @@ async function sendOpenAIRequest(key, endpoint, model, prompt) {
  * @param {Request} req - The request object.
  * @param {Object} env - The environment variables.
  * @param {Object} ctx - The context object.
- * @returns {Response} - The response object.
+ * @returns {Promise<string>} - A promise that resolves to the response content.
  */
 async function handleSummaryRequest(req, env, ctx) {
     try {
         const {
             REDMINE_BASE,
             AI_ENDPOINT,
-            API_KEY
+            AI_API_KEY,
+            AI_API_MODEL,
         } = env;
-        const model = 'gpt-3.5-turbo';
         const { key } = await req.json();
         const entries = await fetchTimeEntries(REDMINE_BASE, key, 'me');
-        const html = renderWeeklyHTML(entries);
-        const prompt = `根据最近一周的工作记录，总结一下本周的工作内容不要超过100字，不要引用原文。下面是最近一周的工作记录：\n${html}`;
-        const summary = await sendOpenAIRequest(API_KEY, AI_ENDPOINT, model, prompt).then(e => `<p>${e}</p>`).catch(e => '');
-        return new Response(html + '\n\n' + summary, { status: 200, headers: { 'Content-Type': 'text/plain' } });
+        let html = renderWeeklyHTML(entries);
+        if (html.length === 0) {
+            return '小老弟，你这周没干活啊？';
+        }
+        if (AI_ENDPOINT && AI_API_KEY && AI_API_MODEL) {
+            const prompt = `根据最近一周的工作记录，总结一下本周的工作内容不要超过100字，不要引用原文。下面是最近一周的工作记录：\n${html}`;
+            const summary = await sendOpenAIRequest(API_KEY, AI_ENDPOINT, model, prompt).then(e => `<p>${e}</p>`).catch(e => '');
+            if (summary) {
+                html += summary;
+            }
+        }
+        return html;
     } catch (e) {
-        return new Response(e.message, { status: 500, headers: { 'Content-Type': 'text/plain' } });
+        return e.message;
     }
 }
 
 export default {
     async fetch(req, env, ctx) {
         if (req.method === 'POST') {
-            return handleSummaryRequest(req, env, ctx);
+            const res = await handleSummaryRequest(req, env, ctx);
+            return new Response(res, { status: 500, headers: { 'Content-Type': 'text/plain' } })
         }
         return new Response(HTML_TEMPLATE.replace('$$REDMINE_BASE$$', env.REDMINE_BASE), {
             headers: {
