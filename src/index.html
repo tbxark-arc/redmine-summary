@@ -37,8 +37,11 @@
         const btn = document.getElementById('submit');
         const output = document.getElementById('output');
         const apiKey = document.getElementById('api-key');
+        const key = localStorage.getItem('api-key');
+        apiKey.value = key || '';
         btn.addEventListener('click', async () => {
             try {
+                localStorage.setItem('api-key', apiKey.value);
                 btn.disabled = true;
                 btn.innerText = '正在生成...';
                 btn.classList.add('disabled');
