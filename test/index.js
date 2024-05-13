@@ -9,7 +9,10 @@ const rl = readline.createInterface({
 
 rl.question("Enter the base URL of your Redmine instance: ", function (url) {
     rl.question("Enter your Redmine API key: ", function (key) {
-        fetchTimeEntries(url, key).then(entries => {
+        fetchTimeEntries(url, key, "me", {
+            from: "2024-05-05",
+            to: "2024-05-11"
+        }).then(entries => {
             console.log(entries);
             console.log(renderWeeklyHTML(entries));
             rl.close();

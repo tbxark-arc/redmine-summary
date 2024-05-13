@@ -1,4 +1,18 @@
 /**
+ * @typedef {Object} TimeRange
+ * @property {string} from - The start date of the time range.
+ * @property {string} to - The end date of the time range.
+ */
+/**
+ * @typedef {Object} Issue
+ * @property {number} issue_id - The ID of the issue.
+ * @property {string} subject - The subject of the issue.
+ * @property {string} type - The type of the issue.
+ */
+/**
+ * @typedef {Object.<number, Issue>} IssuesMap
+ */
+/**
  * @typedef {Object} Entry
  * @property {number} hours - The number of hours spent on the issue.
  * @property {string} comment - The comment associated with the time entry.
@@ -11,21 +25,32 @@
  * @property {Array<Entry>} entries - The time entries for the issue.
  * @property {number} hours - The total hours spent on the issue.
  */
+
+/**
+ * Returns the time range for the current week.
+ * 
+ * @returns {TimeRange} - The time range for the current week.
+ */
+function thisWeekTimeRange() {
+    const today = new Date();
+    const sundayOfThisWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const saturdayOfThisWeek = new Date(today.setDate(today.getDate() + 6));
+    const from = sundayOfThisWeek.toISOString().split('T')[0];
+    const to = saturdayOfThisWeek.toISOString().split('T')[0];
+    return { from, to };
+}
+
 /**
  * Fetches time entries from the Redmine API within a specified date range.
  *
  * @param {string} endpoint - The Redmine API endpoint.
  * @param {string} apikey - The API key for authentication.
  * @param {string} [user='me'] - The user ID for which to fetch time entries. Defaults to 'me'.
+ * @param {TimeRange} [range=thisWeekTimeRange()] - The time range for which to fetch time entries. Defaults to the current week.
  * @returns {Promise<Array<TimeEntry>>} - A promise that resolves to an array of time entries.
  */
-export async function fetchTimeEntries(endpoint, apikey, user = 'me') {
-    const today = new Date();
-    const sundayOfThisWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-    const saturdayOfThisWeek = new Date(today.setDate(today.getDate() + 6));
-    const from = sundayOfThisWeek.toISOString().split('T')[0];
-    const to = saturdayOfThisWeek.toISOString().split('T')[0];
-    const url = `${endpoint}/time_entries.json?from=${from}&to=${to}&limit=100&user_id=${user}`;
+export async function fetchTimeEntries(endpoint, apikey, user = 'me', range = thisWeekTimeRange()) {
+    const url = `${endpoint}/time_entries.json?from=${range.from}&to=${range.to}&limit=100&user_id=${user}`;
     const req = new Request(url, {
         headers: {
             'X-Redmine-API-Key': apikey
@@ -60,15 +85,6 @@ export async function fetchTimeEntries(endpoint, apikey, user = 'me') {
     return issuesList;
 }
 
-/**
- * @typedef {Object} Issue
- * @property {number} issue_id - The ID of the issue.
- * @property {string} subject - The subject of the issue.
- * @property {string} type - The type of the issue.
- */
-/**
- * @typedef {Object.<number, Issue>} IssuesMap
- */
 /**
  * Fetches Redmine issues by their IDs.
  *
@@ -142,7 +158,6 @@ function numberToChinese(num) {
     return chineseNum;
 }
 
-
 /**
  * Groups time entries by type.
  *
@@ -184,7 +199,7 @@ export function renderWeeklyHTML(list) {
                 for (const entry of item.entries) {
                     if (entry.comment) {
                         j += 1;
-                        html += `<li>${numberToChinese(j)}${entry.comment}</li>\n`;
+                        html += `<li>${j}. ${entry.comment}</li>\n`;
                     }
                 }
                 html += `</ul>\n`;
