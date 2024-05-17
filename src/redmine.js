@@ -195,7 +195,7 @@ export function renderWeeklyHTML(list) {
             html += `<li><h5>${numberToChinese(i + 1)}. ${item.subject} (issue: ${item.issue_id})</h5></li>\n`;
             if (item.entries && item.entries.length > 0) {
                 html += `<ul>\n`;
-                let j = 1;
+                let j = 0;
                 for (const entry of item.entries) {
                     if (entry.comment) {
                         j += 1;
