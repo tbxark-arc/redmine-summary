@@ -184,28 +184,29 @@ function timeEntriesToGroup(list) {
 export function renderWeeklyHTML(list) {
     let html = '';
     const typeGroup = timeEntriesToGroup(list);
-
+    const space = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
     for (const type in typeGroup) {
-        html += `<h4>${type}</h4>\n`;
-        html += `<ul>\n`;
+        html += `<h1>${type}</h1><br/>\n`;
+        html += `<div>\n`;
         const entries = typeGroup[type]
         entries.sort((a, b) => a.issue_id - b.issue_id);
         for (let i = 0; i < entries.length; i++) {
             const item = entries[i];
-            html += `<li><h5>${numberToChinese(i + 1)}. ${item.subject} (issue: ${item.issue_id})</h5></li>\n`;
+            html += `<li><h3>${numberToChinese(i + 1)}. ${item.subject} (issue: ${item.issue_id})</h3></li>\n`;
             if (item.entries && item.entries.length > 0) {
-                html += `<ul>\n`;
+                html += `<div>\n`;
                 let j = 0;
                 for (const entry of item.entries) {
                     if (entry.comment) {
                         j += 1;
-                        html += `<li>${j}. ${entry.comment}</li>\n`;
+                        html += `<li style="font-size: 1rem;">${space}${j}. ${entry.comment} (${entry.hours} 小时)</li>\n`;
                     }
                 }
-                html += `</ul>\n`;
+                html += `</div>\n`;
             }
+            html += `<br/>\n`
         }
-        html += `</ul>\n`;
+        html += `</div><br/>\n`;
     }
     return html;
 }

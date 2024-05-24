@@ -26,7 +26,7 @@ async function handleSummaryRequest(req, env, ctx) {
         }
         if (AI_ENDPOINT && AI_API_KEY && AI_API_MODEL) {
             const prompt = `根据最近一周的工作记录，总结一下本周的工作内容不要超过100字，不要引用原文。下面是最近一周的工作记录：\n${html}`;
-            const summary = await sendOpenAIRequest(AI_API_KEY, AI_ENDPOINT, AI_API_MODEL, prompt).then(e => `<p>${e}</p>`).catch(e => '');
+            const summary = await sendOpenAIRequest(AI_API_KEY, AI_ENDPOINT, AI_API_MODEL, prompt).then(e => `<p style="font-size: 1.5rem;">${e}</p>`).catch(e => '');
             if (summary) {
                 html += summary;
             }
