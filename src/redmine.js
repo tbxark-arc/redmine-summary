@@ -199,7 +199,7 @@ export function renderWeeklyHTML(list) {
                 for (const entry of item.entries) {
                     if (entry.comment) {
                         j += 1;
-                        html += `<li style="font-size: 1rem;">${space}${j}. ${entry.comment} (${entry.hours} 小时)</li>\n`;
+                        html += `<li style="font-size: 1rem;">${space}${j}. ${entry.comment}</li>\n`;
                     }
                 }
                 html += `</div>\n`;
